@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: jobs-api
+    ports:
+      - "8600:8600"
+    volumes:
+      - ./output:/app/output
+    environment:
+      - SCRAPER_OUTPUT=/app/output
+    restart: unless-stopped
+    command: uvicorn api_server:app --host 0.0.0.0 --port 8600
+
+  scraper:
+    build: .
+    container_name: jobs-scraper
+    volumes:
+      - ./output:/app/output
+    environment:
+      - SCRAPER_OUTPUT=/app/output
+    profiles:
+      - manual
+    command: python linkedin_scraper.py
