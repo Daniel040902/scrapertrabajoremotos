@@ -284,6 +284,7 @@ def scrape_all():
         job["scraped_at"] = now
 
     merged = merge_jobs(existing, all_new)
+    merged = cleanup_old_jobs(merged, max_dias=7)
     new_only = [j for j in merged if j.get("title") not in {e.get("title") for e in existing}]
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
@@ -309,6 +310,33 @@ def load_existing_jobs() -> list:
         except (json.JSONDecodeError, IOError):
             return []
     return []
+
+
+def parse_job_date(job) -> datetime | None:
+    for campo in ["posted_date", "scraped_at"]:
+        val = job.get(campo, "")
+        if val:
+            try:
+                val_clean = val.replace("Z", "+00:00").split(".")[0]
+                return datetime.fromisoformat(val_clean)
+            except (ValueError, TypeError):
+                try:
+                    return datetime.strptime(val[:10], "%Y-%m-%d")
+                except (ValueError, IndexError):
+                    pass
+    return None
+
+
+def cleanup_old_jobs(jobs: list, max_dias: int = 7) -> list:
+    ahora = datetime.now(timezone.utc)
+    filtrados = []
+    for job in jobs:
+        fecha = parse_job_date(job)
+        if fecha is None:
+            filtrados.append(job)
+        elif (ahora - fecha).days <= max_dias:
+            filtrados.append(job)
+    return filtrados
 
 
 def merge_jobs(existing: list, new_jobs: list) -> list:
