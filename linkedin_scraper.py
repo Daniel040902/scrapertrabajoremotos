@@ -22,96 +22,131 @@ def extraer_id_linkedin(url: str) -> str:
     return ""
 
 
+KEYWORDS_TECH = ["program", "develop", "software", "frontend", "backend", "fullstack", "full stack",
+    "data", "engineer", "coder", "coding", "javascript", "python", "java", "react", "angular",
+    "node", "sql", "devops", "cloud", "web", "app", "mobile", "qa", "test", "aws", "azure",
+    "linux", "it ", "tech", "tecnico", "soporte", "sistemas", "redes", "ciberseguridad",
+    "helpdesk", "administrador", "diseñador", "ux", "ui", "wordpress", "php", "ruby", "go ",
+    "kotlin", "swift", "flutter", "django", "spring", "docker", "kubernetes", "machine learning",
+    "ia", "inteligencia artificial", "big data", "blockchain", "sap", "oracle", "mysql",
+    "mongodb", "git", "api", "microservicios", "scrum", "agile", "automation", "digital"]
+
+BUSQUEDAS_LINKEDIN = [
+    # Junior en español
+    ("programador junior", "junior"), ("desarrollador junior", "junior"),
+    ("junior frontend", "junior"), ("junior backend", "junior"),
+    ("junior full stack", "junior"), ("junior java", "junior"),
+    ("junior python", "junior"), ("junior javascript", "junior"),
+    ("junior react", "junior"), ("junior web", "junior"),
+    ("junior developer", "junior"), ("junior software engineer", "junior"),
+    ("entry level developer", "entry"), ("entry level programmer", "entry"),
+    ("jr developer", "junior"), ("jr programmer", "junior"),
+    ("analista programador junior", "junior"), ("programador trainee", "entry"),
+    ("desarrollador trainee", "entry"), ("trainee it", "entry"),
+    ("trainee informatica", "entry"), ("graduado informatica", "entry"),
+    ("recien graduado programacion", "entry"), ("graduate developer", "entry"),
+    ("junior data analyst", "junior"), ("junior data scientist", "junior"),
+    ("junior devops", "junior"), ("junior cloud", "junior"),
+    ("junior qa", "junior"), ("junior tester", "junior"),
+    ("junior soporte", "junior"), ("junior it", "junior"),
+    ("junior ciberseguridad", "junior"), ("junior redes", "junior"),
+    ("administrador sistemas junior", "junior"), ("becario administrador sistemas", "intern"),
+    # Pasantia / Intern en español
+    ("practicante programacion", "intern"), ("practicante desarrollo", "intern"),
+    ("practicante informatica", "intern"), ("practicante it", "intern"),
+    ("practicante sistemas", "intern"), ("practicante soporte", "intern"),
+    ("becario programacion", "intern"), ("becario desarrollo", "intern"),
+    ("becario informatica", "intern"), ("becario it", "intern"),
+    ("becario sistemas", "intern"), ("pasantia programacion", "intern"),
+    ("pasantia desarrollo", "intern"), ("pasantia informatica", "intern"),
+    ("intern software developer", "intern"), ("intern developer", "intern"),
+    ("intern programmer", "intern"), ("intern it", "intern"),
+    ("intern frontend", "intern"), ("intern backend", "intern"),
+    ("intern data science", "intern"), ("intern data analyst", "intern"),
+    ("intern devops", "intern"), ("intern cloud", "intern"),
+    ("intern qa", "intern"), ("intern tester", "intern"),
+    ("estudiante programacion", "intern"), ("estudiante informatica", "intern"),
+    ("aprendiz desarrollo", "entry"), ("aprendiz informatica", "entry"),
+    ("practicas profesionales programacion", "intern"),
+    ("practicas desarrollo software", "intern"),
+    ("practicas it", "intern"), ("practicas informatica", "intern"),
+    ("becario desarrollo software", "intern"),
+    ("internship software", "intern"), ("internship developer", "intern"),
+    ("internship programmer", "intern"), ("internship it", "intern"),
+]
+
+
+def linkedin_search(client: httpx.Client, keyword: str, nivel: str, location: str = "remote", f_WT: str = "2") -> list:
+    jobs = []
+    try:
+        params = {"keywords": keyword, "location": location, "start": 0}
+        if f_WT:
+            params["f_WT"] = f_WT
+        url = f"https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?{'&'.join(f'{k}={quote_plus(str(v))}' for k,v in params.items())}"
+        resp = client.get(url, timeout=15,
+            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                     "Accept": "text/html,application/xhtml+xml",
+                     "Accept-Language": "es-ES,es;q=0.9"})
+        if resp.status_code == 200:
+            soup = BeautifulSoup(resp.text, "html.parser")
+            for card in soup.select("li"):
+                try:
+                    title_el = card.select_one("h3.base-search-card__title")
+                    company_el = card.select_one("h4.base-search-card__subtitle a")
+                    location_el = card.select_one("span.job-search-card__location")
+                    link_el = card.select_one("a.base-card__full-link")
+                    date_el = card.select_one("time")
+                    if not title_el or not company_el or not link_el:
+                        continue
+                    title = title_el.get_text(strip=True)
+                    company = company_el.get_text(strip=True)
+                    location = location_el.get_text(strip=True) if location_el else "Remoto - Global"
+                    url_job = link_el.get("href", "")
+                    posted = date_el.get("datetime", "") if date_el else ""
+
+                    texto = (title + " " + company + " " + location).lower()
+                    if not any(p in texto for p in KEYWORDS_TECH):
+                        continue
+
+                    cat = "pasantia" if nivel == "intern" else "junior"
+                    salario = ""
+                    sal_el = card.select_one("span.job-search-card__salary-info")
+                    if sal_el:
+                        salario = sal_el.get_text(strip=True)
+
+                    jobs.append({
+                        "title": title, "company": company, "location": location,
+                        "url": url_job, "category": cat, "source": "LinkedIn",
+                        "posted_date": posted, "salary": salario, "tags": keyword,
+                        "is_remote": f_WT == "2",
+                    })
+                except Exception:
+                    continue
+    except Exception as e:
+        print(f"  [!] LinkedIn error ({keyword}/{location}): {e}")
+    return jobs
+
+
 def fetch_linkedin(client: httpx.Client) -> list:
     jobs = []
-    busquedas = [
-        ("programador junior", "junior"),
-        ("desarrollador junior", "junior"),
-        ("practicante programacion", "intern"),
-        ("intern software developer", "intern"),
-        ("trainee developer", "entry"),
-        ("becario desarrollo", "intern"),
-        ("pasantia desarrollo", "intern"),
-        ("junior frontend", "junior"),
-        ("junior backend", "junior"),
-        ("junior full stack", "junior"),
-        ("entry level developer", "entry"),
-        ("junior data analyst", "junior"),
-        ("intern data science", "intern"),
-        ("estudiante programacion", "intern"),
-        ("aprendiz desarrollo", "entry"),
-    ]
-
-    for keyword, nivel in busquedas:
-        try:
-            params = {
-                "keywords": keyword,
-                "location": "remote",
-                "start": 0,
-                "f_WT": "2",
-            }
-            # solo remoto = f_WT=2
-            url = f"https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?{ '&'.join(f'{k}={quote_plus(str(v))}' for k,v in params.items()) }"
-            resp = client.get(url, timeout=15,
-                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                         "Accept": "text/html,application/xhtml+xml",
-                         "Accept-Language": "es-ES,es;q=0.9"})
-            if resp.status_code == 200:
-                soup = BeautifulSoup(resp.text, "html.parser")
-                cards = soup.select("li")
-                for card in cards:
-                    try:
-                        title_el = card.select_one("h3.base-search-card__title")
-                        company_el = card.select_one("h4.base-search-card__subtitle a")
-                        location_el = card.select_one("span.job-search-card__location")
-                        link_el = card.select_one("a.base-card__full-link")
-                        date_el = card.select_one("time")
-                        if not title_el or not company_el or not link_el:
-                            continue
-                        title = title_el.get_text(strip=True)
-                        company = company_el.get_text(strip=True)
-                        location = location_el.get_text(strip=True) if location_el else "Remoto - Global"
-                        url_job = link_el.get("href", "")
-                        posted = date_el.get("datetime", "") if date_el else ""
-
-                        texto = (title + " " + company + " " + location).lower()
-                        if not any(p in texto for p in ["program", "develop", "software", "frontend", "backend", "fullstack", "full stack", "data", "engineer", "coder", "coding", "javascript", "python", "java", "react", "angular", "node", "sql", "devops", "cloud", "web", "app"]):
-                            continue
-
-                        cat = "pasantia" if nivel == "intern" else "junior"
-                        salario = ""
-                        sal_el = card.select_one("span.job-search-card__salary-info")
-                        if sal_el:
-                            salario = sal_el.get_text(strip=True)
-
-                        jobs.append({
-                            "title": title,
-                            "company": company,
-                            "location": location,
-                            "url": url_job,
-                            "category": cat,
-                            "source": "LinkedIn",
-                            "posted_date": posted,
-                            "salary": salario,
-                            "tags": keyword,
-                            "is_remote": True,
-                        })
-                    except Exception:
-                        continue
-            time.sleep(0.5)
-        except Exception as e:
-            print(f"  [!] LinkedIn error ({keyword}): {e}")
-
+    for keyword, nivel in BUSQUEDAS_LINKEDIN:
+        result = linkedin_search(client, keyword, nivel, location="remote", f_WT="2")
+        jobs.extend(result)
+        time.sleep(0.3)
+        # Tambien buscar sin filtro remoto para capturar hibridos/presenciales de España
+        result2 = linkedin_search(client, keyword, nivel, location="Spain", f_WT="")
+        jobs.extend(result2)
+        time.sleep(0.3)
     return jobs
 
 
 def fetch_remotejobs_org(client: httpx.Client) -> list:
     jobs = []
-    for pagina in range(1, 3):
+    for pagina in range(1, 4):
         try:
             params = {
                 "category": "programming",
-                "q": "junior OR intern OR trainee OR entry OR pasantia OR practica",
+                "q": "junior OR intern OR trainee OR entry OR pasantia OR practica OR becario OR jr OR graduate OR estudiante OR aprendiz",
                 "limit": 50,
                 "offset": (pagina - 1) * 50,
             }
@@ -122,9 +157,9 @@ def fetch_remotejobs_org(client: httpx.Client) -> list:
                     title = (item.get("title") or "").lower()
                     desc = (item.get("description") or "").lower()
                     texto = f"{title} {desc}"
-                    if not any(kw in texto for kw in ["junior", "intern", "trainee", "entry", "jr", "graduate", "pasantia", "practica"]):
+                    if not any(kw in texto for kw in ["junior", "intern", "trainee", "entry", "jr", "graduate", "pasantia", "practica", "becario", "estudiante", "aprendiz", "entry-level"]):
                         continue
-                    if not any(kw in texto for kw in ["program", "develop", "software", "frontend", "backend", "fullstack", "data", "engineer", "coder", "javascript", "python", "java", "react", "angular", "node", "sql", "devops", "web", "app"]):
+                    if not any(kw in texto for kw in KEYWORDS_TECH):
                         continue
                     cat = "junior" if any(kw in texto for kw in ["junior", "jr", "entry", "graduate"]) else "pasantia"
                     location = "Remoto - Global"
@@ -176,7 +211,7 @@ def fetch_freehire(client: httpx.Client) -> list:
             for item in data.get("results", []):
                 title = (item.get("role") or "").lower()
                 texto = title + " " + (item.get("description") or "").lower()
-                if not any(kw in texto for kw in ["program", "develop", "software", "frontend", "backend", "fullstack", "data", "engineer", "coder", "javascript", "python", "java", "react", "angular", "node", "sql", "devops", "web", "app"]):
+                if not any(kw in texto for kw in KEYWORDS_TECH):
                     continue
                 cat = "junior" if any(kw in texto for kw in ["junior", "jr", "entry", "graduate"]) else "pasantia"
                 salary = ""
@@ -220,7 +255,7 @@ def fetch_himalayas(client: httpx.Client) -> list:
                 for item in data.get("jobs", []):
                     title = (item.get("title") or "").lower()
                     texto = title + " " + (item.get("description") or "").lower()
-                    if not any(kw in texto for kw in ["program", "develop", "software", "frontend", "backend", "fullstack", "data", "engineer", "coder", "javascript", "python", "java", "react", "angular", "node", "sql", "devops", "web", "app"]):
+                    if not any(kw in texto for kw in KEYWORDS_TECH):
                         continue
                     cat = "junior"
                     location = "Remoto - Global"
@@ -241,6 +276,49 @@ def fetch_himalayas(client: httpx.Client) -> list:
                     })
         except Exception as e:
             print(f"  [!] Himalayas error: {e}")
+    return jobs
+
+
+def fetch_remotive(client: httpx.Client) -> list:
+    jobs = []
+    try:
+        resp = client.get("https://remotive.com/api/remote-jobs?category=software-dev&limit=200", timeout=15)
+        if resp.status_code == 200:
+            data = resp.json()
+            for item in data.get("jobs", []):
+                try:
+                    title = (item.get("title") or "").lower()
+                    desc = (item.get("description") or "").lower()
+                    texto = f"{title} {desc}"
+                    if not any(kw in texto for kw in ["junior", "intern", "trainee", "entry", "jr", "graduate", "pasantia", "practica", "becario", "estudiante", "aprendiz", "entry-level", "júnior"]):
+                        continue
+                    if not any(kw in texto for kw in KEYWORDS_TECH):
+                        continue
+                    cat = "junior" if any(kw in texto for kw in ["junior", "jr", "entry", "graduate", "entry-level"]) else "pasantia"
+                    salary = ""
+                    if item.get("salary"):
+                        salary = str(item["salary"])
+                    elif item.get("salary_min") and item.get("salary_max"):
+                        salary = f"${item['salary_min']:,} - ${item['salary_max']:,}"
+                    company_name = item.get("company_name", "") or ""
+                    location_raw = item.get("candidate_required_location", "") or "Remoto - Global"
+                    location = "Remoto - Global" if any(w in location_raw.lower() for w in ["remote", "worldwide", "anywhere"]) else location_raw
+                    jobs.append({
+                        "title": item.get("title", ""),
+                        "company": company_name,
+                        "location": location,
+                        "url": item.get("url", "") or item.get("apply_url", ""),
+                        "category": cat,
+                        "source": "Remotive",
+                        "posted_date": item.get("publication_date", "") or "",
+                        "salary": salary,
+                        "tags": ", ".join(item.get("tags", [])),
+                        "is_remote": True,
+                    })
+                except Exception:
+                    continue
+    except Exception as e:
+        print(f"  [!] Remotive error: {e}")
     return jobs
 
 
@@ -269,15 +347,15 @@ def scrape_all():
         print(f"      -> {len(remoteorg_jobs)} empleos")
         all_new.extend(remoteorg_jobs)
 
-        print("\n[3/4] Buscando en Freehire...")
-        freehire_jobs = fetch_freehire(client)
-        print(f"      -> {len(freehire_jobs)} empleos")
-        all_new.extend(freehire_jobs)
-
-        print("\n[4/4] Buscando en Himalayas...")
+        print("\n[3/4] Buscando en Himalayas...")
         himalayas_jobs = fetch_himalayas(client)
         print(f"      -> {len(himalayas_jobs)} empleos")
         all_new.extend(himalayas_jobs)
+
+        print("\n[4/4] Buscando en Remotive...")
+        remotive_jobs = fetch_remotive(client)
+        print(f"      -> {len(remotive_jobs)} empleos")
+        all_new.extend(remotive_jobs)
 
     now = datetime.now(timezone.utc).isoformat()
     for job in all_new:
@@ -318,10 +396,13 @@ def parse_job_date(job) -> datetime | None:
         if val:
             try:
                 val_clean = val.replace("Z", "+00:00").split(".")[0]
-                return datetime.fromisoformat(val_clean)
+                dt = datetime.fromisoformat(val_clean)
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                return dt
             except (ValueError, TypeError):
                 try:
-                    return datetime.strptime(val[:10], "%Y-%m-%d")
+                    return datetime.strptime(val[:10], "%Y-%m-%d").replace(tzinfo=timezone.utc)
                 except (ValueError, IndexError):
                     pass
     return None
