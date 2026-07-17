@@ -1,28 +1,27 @@
 import json
+import logging
 import os
 import subprocess
 import sys
-from datetime import datetime, timezone
+import time
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
-from threading import Thread
+from threading import Thread, Lock
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logger = logging.getLogger(__name__)
+
 OUTPUT_DIR = Path(os.environ.get("SCRAPER_OUTPUT", str(Path(__file__).parent / "output")))
 OUTPUT_FILE = OUTPUT_DIR / "jobs.json"
 NEW_JOBS_FILE = OUTPUT_DIR / "new_jobs.json"
+_last_scrape_time = None
+_scrape_lock = Lock()
 
-app = FastAPI(title="LinkedIn Jobs Monitor API", version="2.0.0")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app = FastAPI(title="LinkedIn Jobs Monitor API", version="3.0.0")
 
 
 def load_jobs() -> list:
@@ -45,15 +44,61 @@ def load_new_jobs() -> list:
     return []
 
 
+def run_scraper_in_background():
+    with _scrape_lock:
+        global _last_scrape_time
+        scraper_path = Path(__file__).parent / "linkedin_scraper.py"
+        if not scraper_path.exists():
+            logger.error("Scraper not found at %s", scraper_path)
+            return
+        logger.info("Ejecutando scraper automatico...")
+        result = subprocess.run(
+            [sys.executable, str(scraper_path)],
+            cwd=str(Path(__file__).parent),
+            capture_output=True, text=True, timeout=300
+        )
+        if result.returncode == 0:
+            logger.info("Scraper completado OK")
+            _last_scrape_time = datetime.now(timezone.utc).isoformat()
+        else:
+            logger.error("Scraper fallo:\n%s", result.stderr[:500])
+        for line in result.stdout.splitlines():
+            logger.info("[scraper] %s", line)
+
+
+def scraper_loop():
+    while True:
+        try:
+            run_scraper_in_background()
+        except Exception as e:
+            logger.error("Error en scraper_loop: %s", e)
+        logger.info("Proximo scraping en 3 horas...")
+        time.sleep(10800)
+
+
+@app.on_event("startup")
+async def startup():
+    thread = Thread(target=scraper_loop, daemon=True)
+    thread.start()
+
+
 @app.get("/api/jobs")
 def get_jobs(
     category: str = Query(None, description="Filter: junior, pasantia"),
     source: str = Query(None, description="Filter: RemoteOK, Jobicy, Arbeitnow"),
     search: str = Query(None, description="Search in title, company, tags"),
+    since: str = Query(None, description="ISO timestamp - show jobs scraped after this"),
     limit: int = Query(500, ge=1, le=500),
     offset: int = Query(0, ge=0),
 ):
     jobs = load_jobs()
+
+    if since:
+        try:
+            since_dt = datetime.fromisoformat(since.replace("Z", "+00:00"))
+            jobs = [j for j in jobs if j.get("scraped_at", "") >= since]
+        except ValueError:
+            pass
 
     if category:
         jobs = [j for j in jobs if j.get("category") == category]
@@ -139,6 +184,7 @@ def get_stats():
         "new_jobs": len(new),
         "categories": categories,
         "sources": sources,
+        "last_scrape_time": _last_scrape_time or "",
         "last_updated": datetime.now(timezone.utc).isoformat(),
     }
 
