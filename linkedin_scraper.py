@@ -238,6 +238,22 @@ def linkedin_search(client: httpx.Client, keyword: str, nivel: str, location: st
     return jobs
 
 
+CIUDADES_ES = [
+    "Madrid", "Barcelona", "Valencia", "Sevilla", "Bilbao",
+    "Málaga", "Zaragoza", "Alicante", "Murcia", "Palma",
+    "Las Palmas", "Granada", "Valladolid", "A Coruña",
+    "Gijón", "Pamplona", "San Sebastián", "Córdoba",
+    "Salamanca", "Castellón", "Vigo", "Tarragona",
+    "Lleida", "Huelva", "Almería",
+]
+
+def es_busqueda_es(keyword: str) -> bool:
+    kw = keyword.lower()
+    return any(p in kw for p in ["programador", "desarrollador", "becario", "practicante",
+        "pasantia", "informatica", "sistemas", "soporte", "técnico", "tecnico",
+        "analista", "administrador", "estudiante", "aprendiz", "practicas",
+        "graduado", "recien", "consultor", "trainee", "junior"])
+
 def fetch_linkedin(client: httpx.Client) -> list:
     jobs = []
     for keyword, nivel in BUSQUEDAS_LINKEDIN:
@@ -247,6 +263,11 @@ def fetch_linkedin(client: httpx.Client) -> list:
         result2 = linkedin_search(client, keyword, nivel, location="Spain", f_WT="")
         jobs.extend(result2)
         time.sleep(0.2)
+        if es_busqueda_es(keyword):
+            for ciudad in CIUDADES_ES[:3]:
+                result3 = linkedin_search(client, keyword, nivel, location=ciudad, f_WT="")
+                jobs.extend(result3)
+                time.sleep(0.15)
     return jobs
 
 
