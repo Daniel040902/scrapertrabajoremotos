@@ -130,7 +130,8 @@ class JobsActivity : AppCompatActivity() {
         val posted = job.optString("posted_date", "")
         val tresH = ahora - 3L * 3600000
         if (filter == "3h") {
-            return parseIso(posted) >= tresH || parseIso(job.optString("scraped_at", "")) >= tresH
+            val hoy = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).format(java.util.Date(ahora))
+            return posted.startsWith(hoy) || parseIso(job.optString("scraped_at", "")) >= tresH
         }
         if (filter == "recientes") {
             val hoy = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).format(java.util.Date(ahora))
