@@ -59,119 +59,37 @@ KEYWORDS_TECH = [
 ]
 
 BUSQUEDAS_LINKEDIN = [
-    # Junior en español
     ("junior programador", "junior"), ("junior desarrollador", "junior"),
     ("junior frontend", "junior"), ("junior backend", "junior"),
-    ("junior full stack", "junior"), ("junior fullstack", "junior"),
-    ("junior java", "junior"), ("junior python", "junior"),
-    ("junior javascript", "junior"), ("junior react", "junior"),
-    ("junior angular", "junior"), ("junior vue", "junior"),
-    ("junior web", "junior"), ("junior developer", "junior"),
-    ("junior software engineer", "junior"), ("junior software", "junior"),
-    ("junior it", "junior"), ("junior soporte", "junior"),
-    ("junior qa", "junior"), ("junior tester", "junior"),
-    ("junior data", "junior"), ("junior data analyst", "junior"),
-    ("junior data science", "junior"), ("junior devops", "junior"),
-    ("junior cloud", "junior"), ("junior aws", "junior"),
-    ("junior azure", "junior"), ("junior ciberseguridad", "junior"),
-    ("junior redes", "junior"), ("junior sistemas", "junior"),
-    ("junior administrador", "junior"), ("junior analista", "junior"),
-    ("junior consultor", "junior"), ("junior sap", "junior"),
-    ("junior oracle", "junior"), ("junior sql", "junior"),
-    ("junior dba", "junior"), ("junior mobile", "junior"),
-    ("junior ios", "junior"), ("junior android", "junior"),
-    ("junior php", "junior"), ("junior wordpress", "junior"),
-    ("junior node", "junior"), ("junior django", "junior"),
-    ("junior docker", "junior"), ("junior kubernetes", "junior"),
-    ("junior testing", "junior"), ("junior automation", "junior"),
-    ("junior rpa", "junior"), ("junior bi", "junior"),
-    ("junior erp", "junior"), ("junior crm", "junior"),
-    ("junior dynamics", "junior"), ("junior power bi", "junior"),
-    ("junior salesforce", "junior"), ("junior servicenow", "junior"),
-    ("junior sharepoint", "junior"),
-    ("entry level programmer", "entry"), ("entry level developer", "entry"),
+    ("junior full stack", "junior"), ("junior java", "junior"),
+    ("junior python", "junior"), ("junior javascript", "junior"),
+    ("junior developer", "junior"), ("junior software", "junior"),
+    ("junior it", "junior"), ("junior data", "junior"),
+    ("junior qa", "junior"), ("junior devops", "junior"),
+    ("junior web", "junior"), ("junior mobile", "junior"),
+    ("jr programmer", "junior"), ("jr developer", "junior"),
+    ("entry level developer", "entry"), ("entry level programmer", "entry"),
     ("entry level software", "entry"), ("entry level it", "entry"),
-    ("entry level data", "entry"), ("entry level java", "entry"),
-    ("entry level python", "entry"), ("entry level web", "entry"),
-    ("entry level frontend", "entry"), ("entry level backend", "entry"),
-    ("entry level qa", "entry"), ("entry level tester", "entry"),
-    ("jr developer", "junior"), ("jr programmer", "junior"),
-    ("jr software engineer", "junior"), ("jr java", "junior"),
-    ("jr python", "junior"), ("jr frontend", "junior"),
-    ("jr backend", "junior"), ("jr data", "junior"),
-    ("jr qa", "junior"), ("jr it", "junior"),
-    ("analista programador junior", "junior"),
-    ("analista funcional junior", "junior"),
-    ("programador trainee", "entry"), ("desarrollador trainee", "entry"),
-    ("trainee it", "entry"), ("trainee informatica", "entry"),
-    ("trainee developer", "entry"), ("trainee programmer", "entry"),
-    ("trainee software", "entry"), ("trainee data", "entry"),
-    ("trainee qa", "entry"), ("trainee java", "entry"),
-    ("trainee python", "entry"), ("trainee frontend", "entry"),
-    ("trainee backend", "entry"),
-    ("graduado informatica", "entry"), ("graduado programacion", "entry"),
-    ("graduado sistemas", "entry"), ("recien graduado", "entry"),
+    ("trainee programador", "entry"), ("trainee developer", "entry"),
+    ("trainee informatica", "entry"), ("trainee it", "entry"),
+    ("recien graduado programacion", "entry"),
     ("graduate developer", "entry"), ("graduate programmer", "entry"),
-    ("graduate software", "entry"), ("graduate it", "entry"),
-    ("graduate data", "entry"), ("graduate java", "entry"),
-    ("graduate python", "entry"), ("graduate frontend", "entry"),
-    ("graduate backend", "entry"),
-    # Pasantia / Intern
     ("practicante programacion", "intern"),
     ("practicante desarrollo", "intern"),
-    ("practicante informatica", "intern"),
-    ("practicante it", "intern"), ("practicante sistemas", "intern"),
-    ("practicante soporte", "intern"), ("practicante testing", "intern"),
-    ("practicante qa", "intern"), ("practicante data", "intern"),
-    ("practicante desarrollo software", "intern"),
-    ("practicante desarrollo web", "intern"),
-    ("practicante desarrollo movil", "intern"),
-    ("practicante desarrollo movil", "intern"),
-    ("practicante frontend", "intern"), ("practicante backend", "intern"),
-    ("practicante java", "intern"), ("practicante python", "intern"),
-    ("practicante javascript", "intern"),
-    ("becario programacion", "intern"), ("becario desarrollo", "intern"),
-    ("becario informatica", "intern"), ("becario it", "intern"),
-    ("becario sistemas", "intern"), ("becario soporte", "intern"),
-    ("becario testing", "intern"), ("becario qa", "intern"),
-    ("becario data", "intern"), ("becario desarrollo software", "intern"),
-    ("becario desarrollo web", "intern"), ("becario java", "intern"),
-    ("becario python", "intern"),
+    ("practicante informatica", "intern"), ("practicante it", "intern"),
+    ("becario programacion", "intern"), ("becario informatica", "intern"),
+    ("becario desarrollo", "intern"), ("becario it", "intern"),
     ("pasantia programacion", "intern"), ("pasantia desarrollo", "intern"),
     ("pasantia informatica", "intern"), ("pasantia it", "intern"),
-    ("pasantia sistemas", "intern"), ("pasantia testing", "intern"),
-    ("pasantia data", "intern"), ("pasantia desarrollo software", "intern"),
-    ("intern software developer", "intern"),
     ("intern developer", "intern"), ("intern programmer", "intern"),
-    ("intern it", "intern"), ("intern frontend", "intern"),
-    ("intern backend", "intern"), ("intern data science", "intern"),
-    ("intern data analyst", "intern"), ("intern devops", "intern"),
-    ("intern cloud", "intern"), ("intern qa", "intern"),
-    ("intern tester", "intern"), ("intern java", "intern"),
-    ("intern python", "intern"), ("intern javascript", "intern"),
-    ("intern web", "intern"), ("intern mobile", "intern"),
-    ("intern ios", "intern"), ("intern android", "intern"),
+    ("intern software", "intern"), ("intern it", "intern"),
+    ("internship developer", "intern"), ("internship programmer", "intern"),
     ("internship software", "intern"),
-    ("internship developer", "intern"),
-    ("internship programmer", "intern"),
-    ("internship it", "intern"), ("internship data", "intern"),
-    ("internship frontend", "intern"), ("internship backend", "intern"),
-    ("internship java", "intern"), ("internship python", "intern"),
-    ("internship qa", "intern"), ("internship testing", "intern"),
     ("estudiante programacion", "intern"),
-    ("estudiante informatica", "intern"),
-    ("estudiante sistemas", "intern"), ("estudiante it", "intern"),
-    ("estudiante ingenieria", "intern"),
-    ("aprendiz desarrollo", "entry"), ("aprendiz informatica", "entry"),
-    ("aprendiz programacion", "entry"), ("aprendiz it", "entry"),
-    ("practicas profesionales", "intern"),
-    ("practicas desarrollo software", "intern"),
-    ("practicas desarrollo web", "intern"),
-    ("practicas it", "intern"), ("practicas informatica", "intern"),
-    ("pasantia en programacion", "intern"),
-    ("pasantia en desarrollo", "intern"),
-    ("pasantia en informatica", "intern"),
-    ("pasantia en it", "intern"), ("pasantia en sistemas", "intern"),
+    ("estudiante informatica", "intern"), ("estudiante it", "intern"),
+    ("aprendiz programacion", "entry"), ("aprendiz informatica", "entry"),
+    ("practicas programacion", "intern"), ("practicas informatica", "intern"),
+    ("practicas desarrollo", "intern"), ("practicas it", "intern"),
 ]
 
 
@@ -184,7 +102,7 @@ def es_senior(title: str, desc: str = "") -> bool:
     return False
 
 
-def linkedin_search(client: httpx.Client, keyword: str, nivel: str, location: str = "remote", f_WT: str = "2") -> list:
+def linkedin_search(client: httpx.Client, keyword: str, nivel: str, location: str = "remote", f_WT: str = "2", max_pages: int = 1) -> list:
     jobs = []
     try:
         params = {"keywords": keyword, "location": location, "start": 0}
@@ -250,24 +168,23 @@ CIUDADES_ES = [
 def es_busqueda_es(keyword: str) -> bool:
     kw = keyword.lower()
     return any(p in kw for p in ["programador", "desarrollador", "becario", "practicante",
-        "pasantia", "informatica", "sistemas", "soporte", "técnico", "tecnico",
-        "analista", "administrador", "estudiante", "aprendiz", "practicas",
-        "graduado", "recien", "consultor", "trainee", "junior"])
+        "pasantia", "informatica", "practicas", "estudiante", "aprendiz",
+        "recien", "trainee"])
 
 def fetch_linkedin(client: httpx.Client) -> list:
     jobs = []
     for keyword, nivel in BUSQUEDAS_LINKEDIN:
         result = linkedin_search(client, keyword, nivel, location="remote", f_WT="2")
         jobs.extend(result)
-        time.sleep(0.2)
+        time.sleep(0.1)
         result2 = linkedin_search(client, keyword, nivel, location="Spain", f_WT="")
         jobs.extend(result2)
-        time.sleep(0.2)
+        time.sleep(0.1)
         if es_busqueda_es(keyword):
             for ciudad in CIUDADES_ES[:3]:
                 result3 = linkedin_search(client, keyword, nivel, location=ciudad, f_WT="")
                 jobs.extend(result3)
-                time.sleep(0.15)
+                time.sleep(0.08)
     return jobs
 
 
@@ -567,6 +484,88 @@ def fetch_remoteok(client: httpx.Client) -> list:
     return jobs
 
 
+def fetch_computrabajo(client: httpx.Client) -> list:
+    jobs = []
+    keywords = [
+        "programador+junior", "practicante+programacion", "becario+informatica",
+        "desarrollador+junior", "trainee+programacion", "estudiante+informatica",
+        "practicas+programacion", "pasantia+desarrollo", "junior+frontend",
+        "junior+python", "soporte+tecnico", "analista+junior",
+    ]
+    seen_urls = set()
+    for kw in keywords:
+        for intento in range(2):
+            if intento == 0:
+                url = f"https://es.computrabajo.com/trabajo-de-{kw}-remoto"
+            else:
+                url = f"https://es.computrabajo.com/ofertas-de-trabajo/?q={kw.replace('+',' ')}&s=1"
+            try:
+                resp = client.get(url, timeout=10)
+                if resp.status_code != 200 or len(resp.text) < 5000:
+                    continue
+                import re
+                ofertas = re.findall(r'/oferta/([^/\"\'\\?]+)', resp.text)
+                for oferta in ofertas[:10]:
+                    url_job = f"https://es.computrabajo.com/oferta/{oferta}"
+                    if url_job in seen_urls:
+                        continue
+                    seen_urls.add(url_job)
+                    title_match = re.search(r'class="[^"]*title[^"]*"[^>]*>([^<]+)', resp.text)
+                    company_match = re.search(r'class="[^"]*company[^"]*"[^>]*>([^<]+)', resp.text)
+                    title = title_match.group(1).strip() if title_match else f"Oferta {kw}"
+                    company = company_match.group(1).strip() if company_match else ""
+                    jobs.append({
+                        "title": title, "company": company, "location": "Remoto - España",
+                        "url": url_job, "category": "junior", "source": "Computrabajo ES",
+                        "posted_date": "", "salary": "", "tags": kw.replace("+", " "),
+                        "is_remote": True,
+                    })
+            except Exception:
+                continue
+        time.sleep(0.2)
+    return jobs
+
+
+def fetch_tecnoempleo(client: httpx.Client) -> list:
+    jobs = []
+    keywords = [
+        "programador+junior", "practicante+programacion", "becario+informatica",
+        "desarrollador+junior", "trainee+it", "soporte+tecnico",
+    ]
+    seen_urls = set()
+    for kw in keywords:
+        for intento in range(2):
+            if intento == 0:
+                url = f"https://www.tecnoempleo.com/ofertas-trabajo/?keyword={kw}&teletrabajo=1"
+            else:
+                url = f"https://www.tecnoempleo.com/ofertas-empleo-{kw}-remoto.php"
+            try:
+                resp = client.get(url, timeout=10)
+                if resp.status_code != 200 or len(resp.text) < 3000:
+                    continue
+                import re
+                ofertas = re.findall(r'/empleo-[^/\"\'\\?<>]+\.html', resp.text)
+                for oferta in ofertas[:10]:
+                    url_job = f"https://www.tecnoempleo.com{oferta}" if oferta.startswith('/') else oferta
+                    if url_job in seen_urls:
+                        continue
+                    seen_urls.add(url_job)
+                    title_match = re.search(r'<h2[^>]*class="[^"]*title[^"]*"[^>]*>([^<]+)', resp.text)
+                    company_match = re.search(r'class="[^"]*company[^"]*"[^>]*>([^<]+)', resp.text)
+                    title = title_match.group(1).strip() if title_match else f"Oferta {kw}"
+                    company = company_match.group(1).strip() if company_match else ""
+                    jobs.append({
+                        "title": title, "company": company, "location": "Remoto - España",
+                        "url": url_job, "category": "junior", "source": "Tecnoempleo",
+                        "posted_date": "", "salary": "", "tags": kw.replace("+", " "),
+                        "is_remote": True,
+                    })
+            except Exception:
+                continue
+        time.sleep(0.2)
+    return jobs
+
+
 def scrape_all():
     print("=" * 60)
     print("Empleos Junior/Pasantia - Programacion Remoto Global")
@@ -582,40 +581,50 @@ def scrape_all():
         follow_redirects=True,
         headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
     ) as client:
-        print("\n[1/5] Buscando en LinkedIn...")
+        print("\n[1/9] Buscando en LinkedIn...")
         linkedin_jobs = fetch_linkedin(client)
         print(f"      -> {len(linkedin_jobs)} empleos")
         all_new.extend(linkedin_jobs)
 
-        print("\n[2/5] Buscando en RemoteJobs.org...")
+        print("\n[2/9] Buscando en RemoteJobs.org...")
         remoteorg_jobs = fetch_remotejobs_org(client)
         print(f"      -> {len(remoteorg_jobs)} empleos")
         all_new.extend(remoteorg_jobs)
 
-        print("\n[3/5] Buscando en Himalayas...")
+        print("\n[3/9] Buscando en Himalayas...")
         himalayas_jobs = fetch_himalayas(client)
         print(f"      -> {len(himalayas_jobs)} empleos")
         all_new.extend(himalayas_jobs)
 
-        print("\n[4/5] Buscando en Remotive...")
+        print("\n[4/9] Buscando en Remotive...")
         remotive_jobs = fetch_remotive(client)
         print(f"      -> {len(remotive_jobs)} empleos")
         all_new.extend(remotive_jobs)
 
-        print("\n[5/7] Buscando en Arbeitnow...")
+        print("\n[5/9] Buscando en Arbeitnow...")
         arbeitnow_jobs = fetch_arbeitnow(client)
         print(f"      -> {len(arbeitnow_jobs)} empleos")
         all_new.extend(arbeitnow_jobs)
 
-        print("\n[6/7] Buscando en RemoteOK...")
+        print("\n[6/9] Buscando en RemoteOK...")
         remoteok_jobs = fetch_remoteok(client)
         print(f"      -> {len(remoteok_jobs)} empleos")
         all_new.extend(remoteok_jobs)
 
-        print("\n[7/7] Buscando en JobsBase...")
+        print("\n[7/9] Buscando en JobsBase...")
         jobsbase_jobs = fetch_jobsbase(client)
         print(f"      -> {len(jobsbase_jobs)} empleos")
         all_new.extend(jobsbase_jobs)
+
+        print("\n[8/9] Buscando en Computrabajo ES...")
+        computrabajo_jobs = fetch_computrabajo(client)
+        print(f"      -> {len(computrabajo_jobs)} empleos")
+        all_new.extend(computrabajo_jobs)
+
+        print("\n[9/9] Buscando en Tecnoempleo...")
+        tecnoempleo_jobs = fetch_tecnoempleo(client)
+        print(f"      -> {len(tecnoempleo_jobs)} empleos")
+        all_new.extend(tecnoempleo_jobs)
 
     now = datetime.now(timezone.utc).isoformat()
     for job in all_new:
