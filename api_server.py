@@ -50,20 +50,26 @@ def run_scraper_in_background():
         scraper_path = Path(__file__).parent / "linkedin_scraper.py"
         if not scraper_path.exists():
             logger.error("Scraper not found at %s", scraper_path)
+            _last_scrape_time = datetime.now(timezone.utc).isoformat()
             return
         logger.info("Ejecutando scraper automatico...")
-        result = subprocess.run(
-            [sys.executable, str(scraper_path)],
-            cwd=str(Path(__file__).parent),
-            capture_output=True, text=True, timeout=300
-        )
-        if result.returncode == 0:
-            logger.info("Scraper completado OK")
-            _last_scrape_time = datetime.now(timezone.utc).isoformat()
-        else:
-            logger.error("Scraper fallo:\n%s", result.stderr[:500])
-        for line in result.stdout.splitlines():
-            logger.info("[scraper] %s", line)
+        try:
+            result = subprocess.run(
+                [sys.executable, str(scraper_path)],
+                cwd=str(Path(__file__).parent),
+                capture_output=True, text=True, timeout=300
+            )
+            if result.returncode == 0:
+                logger.info("Scraper completado OK")
+            else:
+                logger.error("Scraper fallo (codigo %d):\n%s", result.returncode, result.stderr[:1000])
+            for line in result.stdout.splitlines():
+                logger.info("[scraper] %s", line)
+        except subprocess.TimeoutExpired:
+            logger.error("Scraper timeout (>5 min)")
+        except Exception as e:
+            logger.error("Error ejecutando scraper: %s", e)
+        _last_scrape_time = datetime.now(timezone.utc).isoformat()
 
 
 def scraper_loop():
@@ -78,6 +84,13 @@ def scraper_loop():
 
 @app.on_event("startup")
 async def startup():
+    logger.info("=== INICIANDO SERVIDOR ===")
+    logger.info("Ejecutando primer scrape sincrono...")
+    try:
+        run_scraper_in_background()
+    except Exception as e:
+        logger.error("Primer scrape fallo: %s", e)
+    logger.info("Primer scrape completado. Iniciando loop cada 3h...")
     thread = Thread(target=scraper_loop, daemon=True)
     thread.start()
 
