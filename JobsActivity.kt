@@ -117,22 +117,24 @@ class JobsActivity : AppCompatActivity() {
     }
 
     private fun parseIso(iso: String): Long = try {
-        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(iso.take(19))?.time ?: 0
+        if (iso.length >= 19) {
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(iso.substring(0, 19))?.time ?: 0
+        } else if (iso.length >= 10) {
+            SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(iso.substring(0, 10))?.time ?: 0
+        } else 0
     } catch (_: Exception) { 0 }
 
     private fun passTime(job: JSONObject, filter: String?): Boolean {
         if (filter == null) return true
         val ahora = System.currentTimeMillis()
+        val posted = job.optString("posted_date", "")
         if (filter == "nuevos") {
-            val posted = parseIso(job.optString("posted_date", ""))
-            val hoy = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).format(java.util.Date(ahora)).let {
-                parseIso(it)
-            }
-            return posted >= hoy || parseIso(job.optString("scraped_at", "")) >= ahora - 3 * 3600000
+            val hoy = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).format(java.util.Date(ahora))
+            return posted.startsWith(hoy) || parseIso(job.optString("scraped_at", "")) >= ahora - 3 * 3600000
         }
         if (filter == "semana") {
             val sem = ahora - 7L * 86400000
-            return parseIso(job.optString("posted_date", "")) >= sem || parseIso(job.optString("scraped_at", "")) >= sem
+            return parseIso(posted) >= sem || parseIso(job.optString("scraped_at", "")) >= sem
         }
         return true
     }
