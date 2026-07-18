@@ -92,7 +92,7 @@ class JobsActivity : AppCompatActivity() {
             arrayOf("Siempre", "Últimas 3h", "Última semana"))
         spinnerTime.setSelection(1)
         spinnerSource.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
-            arrayOf("Todas", "LinkedIn", "RemoteJobs.org", "Himalayas", "Remotive"))
+            arrayOf("Todas", "LinkedIn", "RemoteJobs.org", "Himalayas", "Remotive", "Arbeitnow", "RemoteOK", "JobsBase"))
 
         val listener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p: AdapterView<*>?, v: View?, i: Int, l: Long) { applyFilters() }
@@ -113,7 +113,7 @@ class JobsActivity : AppCompatActivity() {
     }
 
     private fun getSource(): String? = when (spinnerSource.selectedItemPosition) {
-        1 -> "LinkedIn"; 2 -> "RemoteJobs.org"; 3 -> "Himalayas"; 4 -> "Remotive"; else -> null
+        1 -> "LinkedIn"; 2 -> "RemoteJobs.org"; 3 -> "Himalayas"; 4 -> "Remotive"; 5 -> "Arbeitnow"; 6 -> "RemoteOK"; 7 -> "JobsBase"; else -> null
     }
 
     private fun parseIso(iso: String): Long = try {
