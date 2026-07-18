@@ -85,14 +85,10 @@ def scraper_loop():
 @app.on_event("startup")
 async def startup():
     logger.info("=== INICIANDO SERVIDOR ===")
-    logger.info("Ejecutando primer scrape sincrono...")
-    try:
-        run_scraper_in_background()
-    except Exception as e:
-        logger.error("Primer scrape fallo: %s", e)
-    logger.info("Primer scrape completado. Iniciando loop cada 3h...")
+    logger.info("Servidor listo inmediatamente. Primer scrape en BACKGROUND...")
     thread = Thread(target=scraper_loop, daemon=True)
     thread.start()
+    _last_scrape_time = datetime.now(timezone.utc).isoformat()
 
 
 @app.get("/api/jobs")
