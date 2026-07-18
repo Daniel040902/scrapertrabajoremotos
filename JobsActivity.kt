@@ -89,7 +89,7 @@ class JobsActivity : AppCompatActivity() {
             .setOnCheckedStateChangeListener { _, _ -> applyFilters() }
 
         spinnerTime.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
-            arrayOf("Siempre", "Últ. 2 días", "Última semana"))
+            arrayOf("Siempre", "Últimas 3h", "Últ. 2 días", "Última semana"))
         spinnerTime.setSelection(1)
         spinnerSource.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
             arrayOf("Todas", "LinkedIn", "RemoteJobs.org", "Himalayas", "Remotive", "Arbeitnow", "RemoteOK", "JobsBase"))
@@ -109,7 +109,7 @@ class JobsActivity : AppCompatActivity() {
     }
 
     private fun getTime(): String? = when (spinnerTime.selectedItemPosition) {
-        1 -> "recientes"; 2 -> "semana"; else -> null
+        1 -> "3h"; 2 -> "recientes"; 3 -> "semana"; else -> null
     }
 
     private fun getSource(): String? = when (spinnerSource.selectedItemPosition) {
@@ -128,6 +128,10 @@ class JobsActivity : AppCompatActivity() {
         if (filter == null) return true
         val ahora = System.currentTimeMillis()
         val posted = job.optString("posted_date", "")
+        val tresH = ahora - 3L * 3600000
+        if (filter == "3h") {
+            return parseIso(posted) >= tresH || parseIso(job.optString("scraped_at", "")) >= tresH
+        }
         if (filter == "recientes") {
             val hoy = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).format(java.util.Date(ahora))
             val ayer = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).format(java.util.Date(ahora - 86400000))
@@ -205,7 +209,8 @@ class JobsActivity : AppCompatActivity() {
         val total = allJobs.size; val showing = filteredJobs.size
         val fuentes = allJobs.map { it.optString("source", "") }.distinct().size
         statsText.text = when {
-            getTime() == "recientes" -> "🆕 $showing empleos últ. 2 días"
+            getTime() == "3h" -> "🆕 $showing empleos últ. 3h"
+            getTime() == "recientes" -> "📅 $showing empleos últ. 2 días"
             getTime() == "semana" -> "📅 $showing empleos últ. semana"
             getSource() != null -> "$showing de $total en ${getSource()}"
             else -> "$showing de $total empleos ($fuentes fuentes)"
