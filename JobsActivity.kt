@@ -80,6 +80,7 @@ class JobsActivity : AppCompatActivity() {
         btnRefresh.setOnClickListener { loadJobs() }
         btnRetry.setOnClickListener { loadJobs() }
         setupFilters()
+        JobNotificationService.start(this)
         loadJobs()
     }
 
@@ -122,7 +123,13 @@ class JobsActivity : AppCompatActivity() {
     private fun passTime(job: JSONObject, filter: String?): Boolean {
         if (filter == null) return true
         val ahora = System.currentTimeMillis()
-        if (filter == "nuevos") return parseIso(job.optString("scraped_at", "")) >= ahora - 3 * 3600000
+        if (filter == "nuevos") {
+            val posted = parseIso(job.optString("posted_date", ""))
+            val hoy = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).format(java.util.Date(ahora)).let {
+                parseIso(it)
+            }
+            return posted >= hoy || parseIso(job.optString("scraped_at", "")) >= ahora - 3 * 3600000
+        }
         if (filter == "semana") {
             val sem = ahora - 7L * 86400000
             return parseIso(job.optString("posted_date", "")) >= sem || parseIso(job.optString("scraped_at", "")) >= sem

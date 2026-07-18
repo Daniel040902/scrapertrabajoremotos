@@ -59,14 +59,9 @@ class JobNotificationService : Service() {
     private fun checkForNewJobs() {
         try {
             val baseUrl = getApiUrl()
-            val since = if (lastCheckTime.isNotEmpty()) {
-                lastCheckTime
-            } else {
-                java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
-                    .format(java.util.Date(System.currentTimeMillis() - 3 * 3600000))
-            }
-            val urlStr = "$baseUrl/jobs/new?since=$since"
-            val urlStr = "$baseUrl/jobs/new?since=$since"
+            val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                .format(java.util.Date())
+            val urlStr = "$baseUrl/jobs?limit=500"
 
             val url = URL(urlStr)
             val conn = url.openConnection() as HttpURLConnection
@@ -78,10 +73,30 @@ class JobNotificationService : Service() {
             if (conn.responseCode == 200) {
                 val response = conn.inputStream.bufferedReader().readText()
                 val json = JSONObject(response)
-                val jobs = json.getJSONArray("jobs")
+                val allJobs = json.getJSONArray("jobs")
 
-                if (jobs.length() > 0) {
-                    sendJobNotification(jobs)
+                val newJobs = JSONArray()
+                val seenIds = mutableSetOf<String>()
+                if (lastCheckTime.isNotEmpty()) {
+                    val savedIds = getSharedPreferences("job_prefs", MODE_PRIVATE)
+                        .getString("seen_job_ids", "") ?: ""
+                    seenIds.addAll(savedIds.split(",").filter { it.isNotEmpty() })
+                }
+
+                for (i in 0 until allJobs.length()) {
+                    val job = allJobs.getJSONObject(i)
+                    val posted = job.optString("posted_date", "")
+                    if (posted.startsWith(today)) {
+                        val jobId = "${job.optString("title")}_${job.optString("company")}"
+                        if (jobId !in seenIds) {
+                            newJobs.put(job)
+                            seenIds.add(jobId)
+                        }
+                    }
+                }
+
+                if (newJobs.length() > 0) {
+                    sendJobNotification(newJobs)
                 }
 
                 lastCheckTime = java.text.SimpleDateFormat(
@@ -91,9 +106,10 @@ class JobNotificationService : Service() {
                 getSharedPreferences("job_prefs", MODE_PRIVATE)
                     .edit()
                     .putString("last_check", lastCheckTime)
+                    .putString("seen_job_ids", seenIds.joinToString(",").take(20000))
                     .apply()
 
-                updateForegroundNotification("Última revisión: ${jobs.length()} nuevos")
+                updateForegroundNotification("Revisión: ${newJobs.length()} nuevos hoy")
             }
             conn.disconnect()
         } catch (e: Exception) {
